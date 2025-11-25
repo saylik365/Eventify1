@@ -1,0 +1,110 @@
+
+Eventify Backend Test Summary
+==============================
+
+All backend endpoints were tested using PowerShell Invoke-RestMethod commands.
+MongoDB Atlas connection and JWT verification were confirmed working.
+
+------------------------------------------------------------
+1. AUTH MODULE
+------------------------------------------------------------
+
+# ✅ Register User
+$body = @{
+  name = "Sayali Kulkarni"
+  email = "saylikulkarni0645@gmail.com"
+  password = "123456"
+}
+Invoke-RestMethod -Uri "http://localhost:5000/api/auth/register" `
+  -Method POST -ContentType "application/json" `
+  -Body ($body | ConvertTo-Json)
+
+# ✅ Resend OTP
+$resendBody = @{
+  email = "saylikulkarni0645@gmail.com"
+}
+Invoke-RestMethod -Uri "http://localhost:5000/api/auth/resend-otp" `
+  -Method POST -ContentType "application/json" `
+  -Body ($resendBody | ConvertTo-Json)
+
+# ✅ Verify OTP
+$verifyBody = @{
+  email = "saylikulkarni0645@gmail.com"
+  otp = "839515"
+}
+Invoke-RestMethod -Uri "http://localhost:5000/api/auth/verify-otp" `
+  -Method POST -ContentType "application/json" `
+  -Body ($verifyBody | ConvertTo-Json)
+
+# ✅ Login
+$loginBody = @{
+  email = "saylikulkarni0645@gmail.com"
+  password = "123456"
+}
+$loginResponse = Invoke-RestMethod -Uri "http://localhost:5000/api/auth/login" `
+  -Method POST -ContentType "application/json" `
+  -Body ($loginBody | ConvertTo-Json)
+$token = $loginResponse.token
+
+
+------------------------------------------------------------
+2. EVENT MODULE
+------------------------------------------------------------
+
+# ✅ Create Event
+$eventBody = @{
+  title = "AI Meetup 2025"
+  description = "A community meetup to discuss AI + MERN stack"
+  category = "Technology"
+  date = "2025-12-10"
+  time = "18:00"
+  location = "Pune"
+}
+Invoke-RestMethod -Uri "http://localhost:5000/api/events/create" `
+  -Method POST -Headers @{ Authorization = "Bearer $token" } `
+  -ContentType "application/json" -Body ($eventBody | ConvertTo-Json)
+
+# ✅ Get All Events
+Invoke-RestMethod -Uri "http://localhost:5000/api/events" `
+  -Headers @{ Authorization = "Bearer $token" }
+
+------------------------------------------------------------
+3. GUEST & RSVP MODULE
+------------------------------------------------------------
+
+# ✅ Add Guest
+$guestBody = @{
+  email = "guest1@example.com"
+}
+Invoke-RestMethod -Uri "http://localhost:5000/api/events/690b4c3af163e0de361e70ac/add-guest" `
+  -Method POST -Headers @{ Authorization = "Bearer $token" } `
+  -ContentType "application/json" -Body ($guestBody | ConvertTo-Json)
+
+# ✅ RSVP
+$rsvpBody = @{
+  rsvp = "going"
+}
+Invoke-RestMethod -Uri "http://localhost:5000/api/events/690b4c3af163e0de361e70ac/rsvp" `
+  -Method POST -Headers @{ Authorization = "Bearer $token" } `
+  -ContentType "application/json" -Body ($rsvpBody | ConvertTo-Json)
+
+# ✅ Toggle VIP Guest
+Invoke-RestMethod -Uri "http://localhost:5000/api/events/690b4c3af163e0de361e70ac/guest/690b4ca432f8d7a884f17341/vip" `
+  -Method POST -Headers @{ Authorization = "Bearer $token" }
+
+------------------------------------------------------------
+4. RECOMMENDATIONS MODULE
+------------------------------------------------------------
+
+# ✅ Get Recommendations
+Invoke-RestMethod -Uri "http://localhost:5000/api/events/recommendations" `
+  -Headers @{ Authorization = "Bearer $token" }
+
+Expected Output: []
+Status: ✅ Working (no crash or cast error)
+
+------------------------------------------------------------
+✅ All tests passed successfully.
+Server: localhost:5000
+Database: MongoDB Atlas (Cluster0)
+JWT, OTP, Role-based permissions verified working.
