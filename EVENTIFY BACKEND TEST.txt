@@ -12,7 +12,7 @@ MongoDB Atlas connection and JWT verification were confirmed working.
 # ✅ Register User
 $body = @{
   name = "Sayali Kulkarni"
-  email = "saylikulkarni0645@gmail.com"
+  email = "saylikulkarni@gmail.com"
   password = "123456"
 }
 Invoke-RestMethod -Uri "http://localhost:5000/api/auth/register" `
@@ -21,7 +21,7 @@ Invoke-RestMethod -Uri "http://localhost:5000/api/auth/register" `
 
 # ✅ Resend OTP
 $resendBody = @{
-  email = "saylikulkarni0645@gmail.com"
+  email = "saylikulkarni@gmail.com"
 }
 Invoke-RestMethod -Uri "http://localhost:5000/api/auth/resend-otp" `
   -Method POST -ContentType "application/json" `
@@ -29,7 +29,7 @@ Invoke-RestMethod -Uri "http://localhost:5000/api/auth/resend-otp" `
 
 # ✅ Verify OTP
 $verifyBody = @{
-  email = "saylikulkarni0645@gmail.com"
+  email = "saylikulkarni@gmail.com"
   otp = "839515"
 }
 Invoke-RestMethod -Uri "http://localhost:5000/api/auth/verify-otp" `
@@ -38,7 +38,7 @@ Invoke-RestMethod -Uri "http://localhost:5000/api/auth/verify-otp" `
 
 # ✅ Login
 $loginBody = @{
-  email = "saylikulkarni0645@gmail.com"
+  email = "saylikulkarni@gmail.com"
   password = "123456"
 }
 $loginResponse = Invoke-RestMethod -Uri "http://localhost:5000/api/auth/login" `
