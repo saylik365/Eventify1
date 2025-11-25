@@ -15,6 +15,8 @@ import OwnerDashboard from "./pages/Dashboard/OwnerDashboard";
 import GuestDashboard from "./pages/Dashboard/GuestDashboard";
 import AdminDashboard from "./pages/Dashboard/AdminDashboard";
 
+import EventDetails from "./pages/EventDetails";
+// ...
 
 
 
@@ -33,6 +35,8 @@ function App() {
           <Route path="/dashboard/owner" element={<PrivateRoute><OwnerDashboard/></PrivateRoute>} />
           <Route path="/dashboard/guest" element={<PrivateRoute><GuestDashboard/></PrivateRoute>} />
           <Route path="/dashboard/admin" element={<PrivateRoute><AdminDashboard/></PrivateRoute>} />
+          <Route path="/events/:id" element={<PrivateRoute><EventDetails/></PrivateRoute>} />
+
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
         <ToastContainer position="top-right" autoClose={2000} />

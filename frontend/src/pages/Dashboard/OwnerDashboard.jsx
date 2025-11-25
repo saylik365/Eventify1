@@ -3,6 +3,7 @@ import API from "../../utils/api";
 import RoleTabs from "../../components/RoleTabs";
 import { AuthContext } from "../../context/AuthContext";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 export default function OwnerDashboard() {
   const { user } = useContext(AuthContext);
@@ -11,7 +12,7 @@ export default function OwnerDashboard() {
   const fetchOwned = async () => {
     try {
       const { data } = await API.get("/events");
-      const owned = data.filter(e => e.owner._id === user._id);
+      const owned = data.filter(e => (e.owner && (e.owner._id === user._id || e.owner === user._id)));
       setEvents(owned);
     } catch (err) { toast.error("Failed to fetch owned events"); }
   };
@@ -32,18 +33,8 @@ export default function OwnerDashboard() {
             <h3 className="text-xl font-semibold">{e.title}</h3>
             <p className="text-gray-500">{e.description}</p>
             <div className="flex justify-between mt-3">
-              <button
-                onClick={() => deleteEvent(e._id)}
-                className="text-red-600 text-sm border px-2 py-1 rounded"
-              >
-                Delete
-              </button>
-              <button
-                onClick={() => toast.info("Add Guest / Cohost feature pending")}
-                className="text-blue-600 text-sm border px-2 py-1 rounded"
-              >
-                Manage Guests
-              </button>
+              <button onClick={() => deleteEvent(e._id)} className="text-red-600 text-sm border px-2 py-1 rounded">Delete</button>
+              <Link to={`/events/${e._id}`} className="text-blue-600 text-sm border px-2 py-1 rounded">Manage</Link>
             </div>
           </div>
         ))}

@@ -1,16 +1,15 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import API from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
 import RoleTabs from "../../components/RoleTabs";
 import EventCard from "../../components/EventCard";
+import CreateEvent from "../../components/CreateEvent";
+import RecommendationsSidebar from "../../components/RecommendationsSidebar";
 import { toast } from "react-toastify";
 
 export default function UserDashboard() {
   const { user } = useContext(AuthContext);
   const [events, setEvents] = useState([]);
-  const [form, setForm] = useState({
-    title: "", description: "", category: "", date: "", time: "", location: ""
-  });
 
   const getEvents = async () => {
     try {
@@ -24,42 +23,48 @@ export default function UserDashboard() {
 
   useEffect(() => { getEvents(); }, []);
 
-  const createEvent = async (e) => {
-    e.preventDefault();
+  const handleDelete = async (id) => {
     try {
-      await API.post("/events/create", form);
-      toast.success("Event created");
-      setForm({ title:"", description:"", category:"", date:"", time:"", location:"" });
+      await API.delete(`/events/${id}`);
+      toast.success("Event deleted");
       getEvents();
-    } catch (err) {
-      toast.error(err?.response?.data?.message || "Failed");
-    }
+    } catch (err) { toast.error("Delete failed"); }
+  };
+
+  const handleRSVP = async (eventId, r) => {
+    try {
+      await API.post(`/events/${eventId}/rsvp`, { rsvp: r });
+      toast.success(`RSVP: ${r}`);
+      getEvents();
+    } catch { toast.error("RSVP failed"); }
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto p-6">
       <RoleTabs />
-      <h2 className="text-2xl font-bold mb-4">Welcome, {user?.name}</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Welcome, {user?.name}</h2>
+        <CreateEvent onCreated={getEvents} />
+      </div>
 
-      {/* Create event form */}
-      <form onSubmit={createEvent} className="bg-white shadow p-4 rounded mb-6 grid gap-2 md:grid-cols-2">
-        {["title","description","category","location"].map((f)=>(
-          <input key={f} name={f} placeholder={f}
-            value={form[f]} onChange={e=>setForm({...form,[f]:e.target.value})}
-            className="border p-2 rounded" required />
-        ))}
-        <input type="date" name="date" value={form.date}
-          onChange={e=>setForm({...form,date:e.target.value})}
-          className="border p-2 rounded" required />
-        <input type="time" name="time" value={form.time}
-          onChange={e=>setForm({...form,time:e.target.value})}
-          className="border p-2 rounded" required />
-        <button type="submit" className="col-span-full bg-blue-600 text-white p-2 rounded">Create Event</button>
-      </form>
+      <div className="grid md:grid-cols-4 gap-6">
+        <div className="md:col-span-3">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {events.map(e => (
+              <EventCard
+                key={e._id}
+                event={e}
+                onRSVP={(r)=>handleRSVP(e._id, r)}
+                onDelete={handleDelete}
+                showControls={e.owner === user._id || (e.owner && e.owner._id === user._id)}
+              />
+            ))}
+          </div>
+        </div>
 
-      {/* Events list */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {events.map(e => <EventCard key={e._id} event={e} />)}
+        <div className="md:col-span-1">
+          <RecommendationsSidebar />
+        </div>
       </div>
     </div>
   );
